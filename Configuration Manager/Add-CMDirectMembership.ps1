@@ -8,6 +8,13 @@
             [ValidateNotNull()]
             [System.String] $CollectionName,
 
+            # Parameter CollectionName
+            [Parameter(Mandatory=$true,
+                       Position=0,
+                       HelpMessage="Name of the limiting collection")]
+            [ValidateNotNull()]
+            [System.String] $LimitingCollectionName,
+            
             # Parameter Path
             [Parameter(Mandatory=$true,
                        Position=1,
@@ -20,7 +27,7 @@
 
             # Load a helper function to test
             function TestCMComputer ( [String]$Name ) {
-                $CMDevice = Get-CMDevice -Name $Name -CollectionName 'AT Endpoint Systems Master Device Collection' -Fast
+                $CMDevice = Get-CMDevice -Name $Name -CollectionName $LimitingCollectionName -Fast
                 if ( $null -ne $CMDevice ) {
                     return $true
                 }
@@ -61,7 +68,7 @@
         Process {
             # Add validated computers to the CMCollection as direct members
             ForEach ( $Computer in $ComputersValid ) {
-                Add-CMDeviceCollectionDirectMembershipRule -CollectionName $CollectionName -ResourceId ( Get-CMDevice -Name $Computer -CollectionName 'AT Endpoint Systems Master Device Collection' ).ResourceId
+                Add-CMDeviceCollectionDirectMembershipRule -CollectionName $CollectionName -ResourceId ( Get-CMDevice -Name $Computer -CollectionName $LimitingCollectionName ).ResourceId
             }
         }
         End {}
